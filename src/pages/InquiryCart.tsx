@@ -1,0 +1,252 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useInquiryCart } from '@/hooks/useInquiryCart';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
+import { Trash2, ShoppingCart, Send, Package } from 'lucide-react';
+
+export default function InquiryCart() {
+  const { cart, updateItem, removeItem, clearCart } = useInquiryCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    address: '',
+    city: '',
+    state: '',
+    pin: '',
+  });
+  const [notes, setNotes] = useState('');
+  const [requiredBy, setRequiredBy] = useState('');
+
+  const handleSubmitInquiry = async () => {
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'Please login to submit an inquiry',
+      });
+      navigate('/auth/login?redirect=/inquiry/cart');
+      return;
+    }
+
+    if (cart.length === 0) {
+      toast({
+        title: 'Cart is empty',
+        description: 'Add products to your cart before submitting',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      // Create inquiry
+      const { data: inquiry, error: inquiryError } = await supabase
+        .from('inquiries')
+        .insert({
+          buyer_id: user.id,
+          delivery_address: deliveryDetails.address,
+          delivery_city: deliveryDetails.city,
+          delivery_state: deliveryDetails.state,
+          delivery_pin: deliveryDetails.pin,
+          required_by: requiredBy || null,
+          notes,
+          status: 'open',
+        })
+        .select()
+        .single();
+
+      if (inquiryError) throw inquiryError;
+
+      // Create inquiry items
+      const inquiryItems = cart.map((item) => ({
+        inquiry_id: inquiry.id,
+        product_id: item.productId,
+        qty: item.qty,
+        uom: item.uom,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('inquiry_items')
+        .insert(inquiryItems);
+
+      if (itemsError) throw itemsError;
+
+      toast({
+        title: 'Inquiry submitted successfully!',
+        description: `Inquiry ${inquiry.number} has been created. You will be notified when we respond.`,
+      });
+
+      clearCart();
+      navigate(`/dashboard?inquiry=${inquiry.id}`);
+    } catch (error: any) {
+      console.error('Error submitting inquiry:', error);
+      toast({
+        title: 'Failed to submit inquiry',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (cart.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <Card>
+          <CardContent className="py-16 text-center">
+            <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Your inquiry cart is empty</h2>
+            <p className="text-muted-foreground mb-6">
+              Browse our product catalog and add items to submit an inquiry
+            </p>
+            <Button onClick={() => navigate('/products')}>Browse Products</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Inquiry Cart</h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-4">
+          {cart.map((item) => (
+            <Card key={item.productId}>
+              <CardContent className="p-4">
+                <div className="flex gap-4">
+                  <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Package className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-1">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">SKU: {item.sku}</p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        value={item.qty}
+                        onChange={(e) => updateItem(item.productId, parseInt(e.target.value) || 0)}
+                        className="w-24"
+                        min={1}
+                      />
+                      <span className="text-sm text-muted-foreground">{item.uom}</span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeItem(item.productId)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="lg:col-span-1">
+          <Card className="sticky top-20">
+            <CardContent className="pt-6 space-y-6">
+              <div>
+                <h3 className="font-semibold text-lg mb-4">Delivery Details</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      value={deliveryDetails.address}
+                      onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
+                      placeholder="Street address"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        value={deliveryDetails.city}
+                        onChange={(e) => setDeliveryDetails({ ...deliveryDetails, city: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State</Label>
+                      <Input
+                        id="state"
+                        value={deliveryDetails.state}
+                        onChange={(e) => setDeliveryDetails({ ...deliveryDetails, state: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="pin">PIN Code</Label>
+                    <Input
+                      id="pin"
+                      value={deliveryDetails.pin}
+                      onChange={(e) => setDeliveryDetails({ ...deliveryDetails, pin: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="requiredBy">Required By (Optional)</Label>
+                <Input
+                  id="requiredBy"
+                  type="date"
+                  value={requiredBy}
+                  onChange={(e) => setRequiredBy(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="notes">Additional Notes</Label>
+                <Textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any specific requirements..."
+                  rows={4}
+                />
+              </div>
+
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleSubmitInquiry}
+                disabled={submitting}
+              >
+                <Send className="mr-2 h-5 w-5" />
+                {submitting ? 'Submitting...' : 'Submit Inquiry'}
+              </Button>
+
+              <p className="text-xs text-muted-foreground text-center">
+                You will receive a quote within 24-48 hours
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
