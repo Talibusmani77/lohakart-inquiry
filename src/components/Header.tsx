@@ -8,16 +8,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, ShoppingCart, User, LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Search, ShoppingCart, User, LogOut, LayoutDashboard, Menu, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInquiryCart } from '@/hooks/useInquiryCart';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { useState } from 'react';
 
 export function Header() {
   const { user, signOut } = useAuth();
   const { itemCount } = useInquiryCart();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,6 +106,12 @@ export function Header() {
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -114,9 +124,57 @@ export function Header() {
               </Button>
             )}
 
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64">
+                <nav className="flex flex-col space-y-4 mt-8">
+                  <Link
+                    to="/products"
+                    className="text-foreground/80 hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Products
+                  </Link>
+                  <Link
+                    to="/pricing-index"
+                    className="text-foreground/80 hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Pricing Index
+                  </Link>
+                  <Link
+                    to="/about"
+                    className="text-foreground/80 hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="text-foreground/80 hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Contact
+                  </Link>
+                  <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="px-4">
+                    <div className="relative w-full">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search products..."
+                        className="pl-8"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </form>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
