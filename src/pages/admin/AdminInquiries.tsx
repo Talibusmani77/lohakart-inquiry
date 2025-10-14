@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { InquiryTable } from '@/components/admin/InquiryTable';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminInquiries() {

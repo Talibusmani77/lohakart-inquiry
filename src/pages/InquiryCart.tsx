@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useInquiryCart } from '@/hooks/useInquiryCart';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, ShoppingCart, Send, Package } from 'lucide-react';
 
@@ -53,14 +53,13 @@ export default function InquiryCart() {
       const { data: inquiry, error: inquiryError } = await supabase
         .from('inquiries')
         .insert({
-          buyer_id: user.id,
           delivery_address: deliveryDetails.address,
           delivery_city: deliveryDetails.city,
           delivery_state: deliveryDetails.state,
           delivery_pin: deliveryDetails.pin,
           required_by: requiredBy || null,
           notes,
-          status: 'open',
+          status: 'open' as const,
         })
         .select()
         .single();

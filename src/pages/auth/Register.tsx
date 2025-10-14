@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -32,53 +32,23 @@ export default function Register() {
         password: formData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: formData.name,
+            phone: formData.phone,
+            company_name: formData.companyName,
+            gst: formData.gst,
+          },
         },
       });
 
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create company
-        const { data: companyData, error: companyError } = await supabase
-          .from('companies')
-          .insert({
-            name: formData.companyName,
-            gst: formData.gst,
-            contact_email: formData.email,
-            contact_phone: formData.phone,
-          })
-          .select()
-          .single();
-
-        if (companyError) throw companyError;
-
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            name: formData.name,
-            phone: formData.phone,
-            company_id: companyData.id,
-          });
-
-        if (profileError) throw profileError;
-
-        // Create user role
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: authData.user.id,
-            role: 'user',
-          });
-
-        if (roleError) throw roleError;
-
         toast({
           title: 'Registration successful!',
-          description: 'Welcome to LohaKart',
+          description: 'Welcome to LohaKart. You can now sign in.',
         });
-        navigate('/dashboard');
+        navigate('/auth/login');
       }
     } catch (error: any) {
       toast({

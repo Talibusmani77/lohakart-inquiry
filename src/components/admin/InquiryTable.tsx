@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface Inquiry {
@@ -52,7 +52,7 @@ export function InquiryTable({ inquiries, onRefresh }: InquiryTableProps) {
     try {
       const { error } = await supabase
         .from('inquiries')
-        .update({ status })
+        .update({ status: status as 'open' | 'responded' | 'negotiation' | 'closed' })
         .eq('id', id);
 
       if (error) throw error;

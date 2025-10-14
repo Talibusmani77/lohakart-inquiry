@@ -6,7 +6,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -66,14 +66,20 @@ export default function AdminDashboard() {
       <AdminSidebar />
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center animate-fade-in">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">Admin Dashboard</h1>
+              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
               <p className="text-muted-foreground mt-2">
                 Manage your products and inquiries
               </p>
             </div>
-            <Button onClick={() => navigate('/admin/products/add')} size="lg">
+            <Button 
+              onClick={() => navigate('/admin/products/add')} 
+              size="lg"
+              className="hover-scale shadow-lg"
+            >
               <Plus className="h-5 w-5 mr-2" />
               Add Product
             </Button>
@@ -82,14 +88,14 @@ export default function AdminDashboard() {
           <DashboardStats {...stats} />
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-all duration-300 animate-fade-in hover-scale">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-all hover:translate-x-1"
                   onClick={() => navigate('/admin/products/add')}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -97,14 +103,14 @@ export default function AdminDashboard() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-all hover:translate-x-1"
                   onClick={() => navigate('/admin/products')}
                 >
                   Manage Products
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-all hover:translate-x-1"
                   onClick={() => navigate('/admin/inquiries')}
                 >
                   View Inquiries
@@ -112,7 +118,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-all duration-300 animate-fade-in hover-scale">
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
               </CardHeader>

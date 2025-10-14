@@ -6,7 +6,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { ProductTable } from '@/components/admin/ProductTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus, Search } from 'lucide-react';
 
 export default function AdminProducts() {
