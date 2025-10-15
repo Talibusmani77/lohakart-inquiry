@@ -32,7 +32,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col animate-fade-in">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary via-primary/90 to-secondary py-20 md:py-32">
         <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]" />
@@ -72,10 +72,11 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Explore Categories</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <Card
                 key={category.name}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => navigate('/products')}
               >
                 <CardContent className="p-6 flex flex-col items-center text-center">
@@ -96,8 +97,12 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose LohaKart?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((feature) => (
-              <div key={feature.title} className="flex flex-col items-center text-center">
+            {features.map((feature, index) => (
+              <div 
+                key={feature.title} 
+                className="flex flex-col items-center text-center animate-fade-in"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
                 <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
                   <feature.icon className="h-8 w-8 text-accent" />
                 </div>

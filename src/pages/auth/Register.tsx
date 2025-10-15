@@ -62,8 +62,8 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 animate-fade-in">
+      <Card className="w-full max-w-md animate-scale-in">
         <CardHeader>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Join LohaKart and start sourcing quality metals</CardDescription>

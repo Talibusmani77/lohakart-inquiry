@@ -70,7 +70,7 @@ export default function Products() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-3xl font-bold mb-8">Product Catalog</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -91,14 +91,14 @@ export default function Products() {
               <div>
                 <Label htmlFor="metalType">Metal Type</Label>
                 <Select
-                  value={filters.metalType}
-                  onValueChange={(value) => setFilters({ ...filters, metalType: value })}
+                  value={filters.metalType || "all"}
+                  onValueChange={(value) => setFilters({ ...filters, metalType: value === "all" ? "" : value })}
                 >
                   <SelectTrigger id="metalType">
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All types</SelectItem>
+                    <SelectItem value="all">All types</SelectItem>
                     <SelectItem value="Ferrous">Ferrous</SelectItem>
                     <SelectItem value="Non-Ferrous">Non-Ferrous</SelectItem>
                   </SelectContent>
@@ -108,14 +108,14 @@ export default function Products() {
               <div>
                 <Label htmlFor="category">Category</Label>
                 <Select
-                  value={filters.category}
-                  onValueChange={(value) => setFilters({ ...filters, category: value })}
+                  value={filters.category || "all"}
+                  onValueChange={(value) => setFilters({ ...filters, category: value === "all" ? "" : value })}
                 >
                   <SelectTrigger id="category">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All categories</SelectItem>
+                    <SelectItem value="all">All categories</SelectItem>
                     <SelectItem value="Sheet">Sheet</SelectItem>
                     <SelectItem value="Coil">Coil</SelectItem>
                     <SelectItem value="Plate">Plate</SelectItem>
@@ -152,10 +152,11 @@ export default function Products() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <Card
                   key={product.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => navigate(`/products/${product.slug}`)}
                 >
                   <CardContent className="p-4">

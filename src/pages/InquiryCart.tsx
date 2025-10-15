@@ -119,13 +119,17 @@ export default function InquiryCart() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-3xl font-bold mb-8">Inquiry Cart</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          {cart.map((item) => (
-            <Card key={item.productId}>
+          {cart.map((item, index) => (
+            <Card 
+              key={item.productId}
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
               <CardContent className="p-4">
                 <div className="flex gap-4">
                   <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">

@@ -94,7 +94,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">My Dashboard</h1>
         <Button onClick={() => navigate('/products')}>Browse Products</Button>
@@ -120,8 +120,12 @@ export default function Dashboard() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {inquiries.map((inquiry) => (
-                <Card key={inquiry.id} className="hover:shadow-lg transition-shadow">
+              {inquiries.map((inquiry, index) => (
+                <Card 
+                  key={inquiry.id} 
+                  className="hover:shadow-lg transition-all hover:scale-[1.02] animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
