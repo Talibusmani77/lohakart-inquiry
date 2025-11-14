@@ -1,30 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { InquiryTable } from '@/components/admin/InquiryTable';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminInquiries() {
-  const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useAdminRole();
+  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !roleLoading) {
-      if (!user) {
-        navigate('/auth/login');
-      } else if (!isAdmin) {
-        navigate('/');
+    if (!adminLoading) {
+      if (!isAdminAuthenticated) {
+        navigate('/admin/login');
       } else {
         fetchInquiries();
       }
     }
-  }, [user, isAdmin, authLoading, roleLoading, navigate]);
+  }, [isAdminAuthenticated, adminLoading, navigate]);
 
   const fetchInquiries = async () => {
     try {
@@ -46,7 +42,7 @@ export default function AdminInquiries() {
     }
   };
 
-  if (authLoading || roleLoading || loading) {
+  if (adminLoading || loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

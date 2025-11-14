@@ -1,11 +1,14 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Package,
   FileText,
   Users,
   TrendingUp,
+  LogOut,
 } from 'lucide-react';
 
 const navigation = [
@@ -17,10 +20,17 @@ const navigation = [
 
 export function AdminSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { adminLogout } = useAdminAuth();
+
+  const handleLogout = () => {
+    adminLogout();
+    navigate('/admin/login');
+  };
 
   return (
-    <aside className="w-64 bg-card border-r min-h-screen sticky top-16 hidden lg:block">
-      <nav className="p-4 space-y-2">
+    <aside className="w-64 bg-card border-r min-h-screen sticky top-16 hidden lg:block flex flex-col">
+      <nav className="p-4 space-y-2 flex-1">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -41,6 +51,16 @@ export function AdminSidebar() {
           );
         })}
       </nav>
+      <div className="p-4 border-t">
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="h-5 w-5 mr-3" />
+          <span className="font-medium">Logout</span>
+        </Button>
+      </div>
     </aside>
   );
 }

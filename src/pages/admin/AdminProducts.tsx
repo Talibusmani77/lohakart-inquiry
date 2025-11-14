@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { ProductTable } from '@/components/admin/ProductTable';
 import { Button } from '@/components/ui/button';
@@ -10,8 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus, Search } from 'lucide-react';
 
 export default function AdminProducts() {
-  const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useAdminRole();
+  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -19,16 +17,14 @@ export default function AdminProducts() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (!authLoading && !roleLoading) {
-      if (!user) {
-        navigate('/auth/login');
-      } else if (!isAdmin) {
-        navigate('/');
+    if (!adminLoading) {
+      if (!isAdminAuthenticated) {
+        navigate('/admin/login');
       } else {
         fetchProducts();
       }
     }
-  }, [user, isAdmin, authLoading, roleLoading, navigate]);
+  }, [isAdminAuthenticated, adminLoading, navigate]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -61,7 +57,7 @@ export default function AdminProducts() {
     }
   };
 
-  if (authLoading || roleLoading || loading) {
+  if (adminLoading || loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
