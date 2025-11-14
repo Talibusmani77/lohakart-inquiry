@@ -122,7 +122,7 @@ export function InquiryTable({ inquiries, onRefresh }: InquiryTableProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => navigate(`/inquiry/${inquiry.id}`)}
+                    onClick={() => navigate(`/admin/inquiry/${inquiry.id}`)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
