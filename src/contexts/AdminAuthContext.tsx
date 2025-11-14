@@ -23,7 +23,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const adminLogin = async (username: string, password: string) => {
     try {
-      const { data: credentials, error } = await supabase
+      const { data: credentials, error } = await (supabase as any)
         .from('admin_credentials')
         .select('password_hash')
         .eq('username', username)
@@ -33,7 +33,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'Invalid username or password' };
       }
 
-      const isValid = await bcrypt.compare(password, credentials.password_hash);
+      const isValid = await bcrypt.compare(password, (credentials as any).password_hash);
       
       if (!isValid) {
         return { success: false, error: 'Invalid username or password' };

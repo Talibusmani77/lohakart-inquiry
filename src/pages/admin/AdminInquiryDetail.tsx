@@ -52,7 +52,7 @@ export default function AdminInquiryDetail() {
       if (inquiryError) throw inquiryError;
       setInquiry(inquiryData);
 
-      const { data: repliesData, error: repliesError } = await supabase
+      const { data: repliesData, error: repliesError } = await (supabase as any)
         .from('inquiry_replies')
         .select('*')
         .eq('inquiry_id', id)
@@ -77,7 +77,7 @@ export default function AdminInquiryDetail() {
 
     setSending(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('inquiry_replies')
         .insert({
           inquiry_id: id,
