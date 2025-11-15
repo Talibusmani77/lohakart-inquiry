@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { ProductTable } from '@/components/admin/ProductTable';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus, Search } from 'lucide-react';
 
 export default function AdminProducts() {
-  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,13 +20,15 @@ export default function AdminProducts() {
 
   useEffect(() => {
     if (!adminLoading) {
-      if (!isAdminAuthenticated) {
-        navigate('/admin/login');
+      if (!user) {
+        navigate('/auth/login');
+      } else if (!isAdmin) {
+        navigate('/');
       } else {
         fetchProducts();
       }
     }
-  }, [isAdminAuthenticated, adminLoading, navigate]);
+  }, [user, isAdmin, adminLoading, navigate]);
 
   useEffect(() => {
     if (searchQuery.trim()) {

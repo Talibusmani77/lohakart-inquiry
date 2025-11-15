@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,8 @@ import { format } from 'date-fns';
 
 export default function AdminInquiryDetail() {
   const { id } = useParams();
-  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [inquiry, setInquiry] = useState<any>(null);
@@ -24,12 +26,16 @@ export default function AdminInquiryDetail() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    if (!adminLoading && !isAdminAuthenticated) {
-      navigate('/admin/login');
-    } else if (isAdminAuthenticated) {
-      fetchInquiryDetails();
+    if (!adminLoading) {
+      if (!user) {
+        navigate('/auth/login');
+      } else if (!isAdmin) {
+        navigate('/');
+      } else {
+        fetchInquiryDetails();
+      }
     }
-  }, [isAdminAuthenticated, adminLoading, navigate, id]);
+  }, [user, isAdmin, adminLoading, navigate, id]);
 
   const fetchInquiryDetails = async () => {
     try {

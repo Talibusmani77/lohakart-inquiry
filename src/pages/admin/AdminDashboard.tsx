@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalProducts: 0,
@@ -21,13 +23,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!adminLoading) {
-      if (!isAdminAuthenticated) {
-        navigate('/admin/login');
+      if (!user) {
+        navigate('/auth/login');
+      } else if (!isAdmin) {
+        navigate('/');
       } else {
         fetchStats();
       }
     }
-  }, [isAdminAuthenticated, adminLoading, navigate]);
+  }, [user, isAdmin, adminLoading, navigate]);
 
   const fetchStats = async () => {
     try {
