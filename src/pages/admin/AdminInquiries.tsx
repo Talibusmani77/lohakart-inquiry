@@ -1,26 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { InquiryTable } from '@/components/admin/InquiryTable';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminInquiries() {
-  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!adminLoading) {
-      if (!isAdminAuthenticated) {
-        navigate('/admin/login');
+      if (!user) {
+        navigate('/auth/login');
+      } else if (!isAdmin) {
+        navigate('/');
       } else {
         fetchInquiries();
       }
     }
-  }, [isAdminAuthenticated, adminLoading, navigate]);
+  }, [user, isAdmin, adminLoading, navigate]);
 
   const fetchInquiries = async () => {
     try {

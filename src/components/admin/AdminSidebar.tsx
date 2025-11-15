@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +21,11 @@ const navigation = [
 export function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { adminLogout } = useAdminAuth();
+  const { signOut } = useAuth();
 
-  const handleLogout = () => {
-    adminLogout();
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth/login');
   };
 
   return (
